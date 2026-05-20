@@ -15,7 +15,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Pipeline
 
-- [ ] **DATA-01**: 从 PUDL 获取美国电力数据（负荷、发电、电厂元数据），输出为本地 SQLite/Parquet
+- [ ] **DATA-01**: 获取中国电力数据：OWID 年级数据自动拉取 + 日/小时级数据从地方开放平台手动下载，通过 DataLoader 统一接口加载
 - [ ] **DATA-02**: 实现 DataLoader 抽象类，统一数据访问接口，支持数据版本锁定
 - [ ] **DATA-03**: 数据清洗管道：缺失值填充、异常值检测(IQR)、时区标准化到 UTC
 - [ ] **DATA-04**: 时序特征工程：小时/星期/节日标识、滞后特征(lag features)、滚动窗口统计
