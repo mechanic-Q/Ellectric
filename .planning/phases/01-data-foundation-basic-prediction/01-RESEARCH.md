@@ -30,24 +30,23 @@ Per CONTEXT.md decisions: Chinese local open data platforms for hourly load data
 
 需**手动浏览器下载**电力数据。详见 `docs/chinese-electricity-data-guide.md`（已创建）。
 
-### Recommended Data Strategy (User-Decided)
+### Data Strategy (User-Decided — 仅中国数据)
 
-**用户选择：** 优先中国数据 + 手动获取。Phase 1 分两步走：
-1. **主路径：** 用户根据指南手动从和鲸/天池/地方平台下载中国数据放入 `data/` 目录 → `ChineseDataLoader` 加载
-2. **备用路径：** 如果短期获取不到中国数据 → `EpftoolboxLoader` 加载国际数据（德国EPEX-DE或美国PJM）先跑通管道
+**三路数据源，统一 DataLoader 接口：**
 
-DataLoader 抽象层让两个数据源可互换，不影响下游预测/可视化代码。
+1. **OWID 年级数据（自动获取）：** Our World in Data 提供中国年度发电量/用电量数据（2000-2025），通过 `urllib` + CSV 流式解析自动拉取。用于宏观趋势分析。
+2. **日级数据（手动下载）：** 从和鲸社区、阿里天池、地方开放数据平台手动获取。格式：CSV/Excel，包含 `timestamp` + `load_mw` 列。
+3. **小时级数据（手动下载）：** 同上来源，理想情况下可做短期负荷预测。放入 `data/` 目录后由 `ChineseDataLoader` 自动加载。
+
+**不依赖国际数据。** 不引入 epftoolbox（避免 TensorFlow/PyTorch 冲突），专注中国电力场景。
 
 ### Data Source for Phase 1 Pipeline
 
-**主数据源：** 用户手动获取的中国电力负荷数据（从和鲸社区、阿里天池、地方开放数据平台等）
-- 期望格式：CSV/Excel，包含 `timestamp` + `load_mw` 列
-- 加载方式：`ChineseDataLoader(data_path='data/xxx.csv')`
-
-**备用数据源：** epftoolbox 内置数据集
-- EPEX-DE: 德国日前市场，2015-2020，小时级，含负荷和电价
-- PJM: 美国PJM市场，同样结构
-- 安装：`pip install git+https://github.com/jeslago/epftoolbox.git`
+**主数据源：** OWID 中国年级数据（自动） + 用户手动获取的日/小时数据
+- OWID: `https://raw.githubusercontent.com/owid/energy-data/master/owid-energy-data.csv`
+- 中国行列过滤条件: `country == 'China' AND iso_code == 'CHN'`
+- 关键列: `year`, `electricity_generation`, `electricity_demand`, `coal_electricity`, `solar_electricity`, `wind_electricity`
+- 加载方式: `OWIDChinaLoader().load_yearly_data()` 和 `ChineseDataLoader(data_path='data/xxx.csv').load_data()`
 
 ---
 
