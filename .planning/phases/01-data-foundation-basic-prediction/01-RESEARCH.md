@@ -725,7 +725,7 @@ def train_xgboost(df, target_col="load_mw", n_splits=5):
 | A5 | `enda` 1.0.5 H2O dependency is acceptable for Phase 2+ but not Phase 1 | Standard Stack | If enda is actually required for Phase 1 feature engineering (unlikely given PUDL data quality), we'd need to install H2O or monkey-patch the import |
 | A6 | numpy 2.3.5 is the version that pandas 3.0.3 resolves to | Standard Stack | Version mismatch could cause pandas operations to fail; test `pip install -r requirements.txt --dry-run` first |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **PUDL table choice: `out_` vs `core_` prefix**
    - What we know: `out_eia930__hourly_subregion_demand` includes imputed demand values (`demand_imputed_mwh` column). `core_eia930__hourly_subregion_demand` has raw reported values only.

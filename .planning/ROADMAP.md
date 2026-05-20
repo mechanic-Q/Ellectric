@@ -14,11 +14,13 @@ A hands-on learning journey through AI-driven electricity trading — from pulli
 ## Phase Details
 
 ### Phase 1: Data Foundation + Basic Prediction
+
 **Goal:** Learners can install the environment in one command, pull public energy data, run an XGBoost load forecast with proper temporal splitting, and execute an end-to-end pipeline run (naive forecast → simulation → P&L) — proving all layers connect before adding sophistication.
 **Mode:** mvp
 **Depends on:** Nothing (first phase)
 **Requirements:** ENV-01, ENV-02, ENV-03, DATA-01, DATA-02, DATA-03, DATA-04, PRED-01, VIZ-01
 **Success Criteria** (what must be TRUE):
+
   1. Learner runs a single install script and opens a Jupyter notebook with all core dependencies (pandas, scikit-learn, XGBoost, enda, matplotlib) importable — within 30 minutes on a clean Python 3.11 machine
   2. Learner executes the data ingestion notebook: downloads PUDL data, runs the cleaning pipeline (missing value imputation, IQR outlier detection, UTC timezone normalization), and outputs validated `cleaned_load.parquet` with documented column schemas
   3. Learner executes the feature engineering notebook: generates calendar features (hour, day-of-week, holiday flags), lag features (t-24h, t-168h), and rolling window statistics — with all scalers fit ONLY on training data (TimeSeriesSplit, no look-ahead bias)
@@ -28,16 +30,26 @@ A hands-on learning journey through AI-driven electricity trading — from pulli
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 01-01-PLAN.md — Walking Skeleton: environment setup, PUDL data download, data cleaning, end-to-end persistence forecast → P&L chart
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01-02-PLAN.md — XGBoost load forecasting with TimeSeriesSplit, progressive feature engineering, evaluation metrics, all visualizations, DataLoader abstraction
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 01-03-PLAN.md — Docker Compose skeleton, notebook polish (markdown + reflection questions), README data dictionary, data version pinning
 
 ### Phase 2: Deep Prediction + Market Simulation
+
 **Goal:** Learners compare automated vs manual forecasting (OpenSTEF vs XGBoost), predict day-ahead electricity prices with benchmark models, configure and run ASSUME market simulations with variable generation mixes, and visualize market outcomes through interactive dashboards.
 **Mode:** mvp
 **Depends on:** Phase 1
 **Requirements:** PRED-02, PRED-03, PRED-04, SIM-01, SIM-02, SIM-03, SIM-04
 **Success Criteria** (what must be TRUE):
+
   1. Learner runs OpenSTEF automated forecasting pipeline and sees a side-by-side comparison table: manual XGBoost (Phase 1) vs OpenSTEF — MAE, RMSE, MAPE — with a clear "which model won" summary
   2. Learner generates day-ahead price forecasts using LEAR for at least one reference market (e.g., EPEX-DE) and views LEAR vs DNN vs naive baseline accuracy metrics
   3. Learner opens an interactive plotly dashboard showing multi-model comparison: error-by-hour heatmaps, forecast overlay for the past week, and model ranking by metric
@@ -48,11 +60,13 @@ Plans:
 **UI hint:** yes
 
 ### Phase 3: Trading Agents + Backtesting
+
 **Goal:** Learners connect prediction outputs to trading strategies, train RL agents (PPO/TD3/SAC) with custom reward functions, run historical backtests on stress periods, and evaluate strategy performance through P&L and explainability tools.
 **Mode:** mvp
 **Depends on:** Phase 2
 **Requirements:** AGENT-01, AGENT-02, AGENT-03, AGENT-04, VIZ-02
 **Success Criteria** (what must be TRUE):
+
   1. Learner connects Phase 1/2 forecast output to an ASSUME agent's bidding strategy and observes the agent submitting price-sensitive bids (not just marginal cost) in Grafana bid curve visualization
   2. Learner modifies the RL agent's reward function (e.g., profit-only → risk-adjusted with penalty for zero-volume hours) and observes different emergent bidding behavior in TensorBoard — verified by bid curve shape, not just reward magnitude
   3. Learner runs an end-to-end historical backtest on a stress period (e.g., August 2022 energy crisis), views a cumulative P&L chart comparing RL agent vs rule-based baseline vs oracle strategy, and sees which strategy produces the highest risk-adjusted return
@@ -63,11 +77,13 @@ Plans:
 **UI hint:** yes
 
 ### Phase 4: Integration + LLM Interface
+
 **Goal:** Learners access all platform capabilities through CLI commands, REST API endpoints, and a natural language trading assistant powered by a local LLM (Qwen2.5-7B via Ollama).
 **Mode:** mvp
 **Depends on:** Phase 3
 **Requirements:** INTG-01, INTG-02, INTG-03
 **Success Criteria** (what must be TRUE):
+
   1. Learner starts the FastAPI server and calls `GET /predict?horizon=24h`, receiving a JSON forecast response with timestamped load predictions and confidence intervals from their trained model
   2. Learner runs `ellectric simulate start --scenario summer_peak` from the CLI and receives clearing prices, dispatch summary, and per-agent profit in terminal output
   3. Learner runs `ellectric backtest run --start 2022-08-01 --end 2022-08-31` and receives cumulative P&L, Sharpe ratio, and strategy comparison in tabular CLI output

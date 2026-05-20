@@ -18,7 +18,7 @@ Deliver a working Jupyter-based learning environment where users can: (1) instal
 
 ### Data Storage & Format
 - **D-03:** Parquet as primary data format — portable, columnar, pandas-native, fast read/write without database server. No SQLite unless query complexity demands it later.
-- **D-04:** Standardized column schema documented inline: `datetime_utc`, `load_mw`, `temperature_f` (if weather available), plus metadata columns. All timestamps in UTC with timezone-aware pandas dtypes.
+- **D-04:** Standardized column schema documented inline: `timestamp` (datetime64[ns, UTC]), `load_mw` (float64), `temperature_f` (if weather available), plus metadata columns. All timestamps in UTC with timezone-aware pandas dtypes. Column name `timestamp` used for brevity while preserving full timezone awareness.
 
 ### Environment Setup
 - **D-05:** pip + venv with `requirements.txt` (pinned versions from STACK.md). One-command setup: `python3.11 -m venv .venv && pip install -r requirements.txt`. Target: <30 minutes on clean machine.
