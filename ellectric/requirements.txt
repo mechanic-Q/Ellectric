@@ -1,0 +1,19 @@
+# Ellectric — 核心依赖
+# 安装: pip install -r requirements.txt
+# 国内镜像: pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# ── 数据处理 ──────────────────────────────────────────
+pandas==3.0.3
+numpy>=2.0.0
+pyarrow==22.0.0
+
+# ── 机器学习 ──────────────────────────────────────────
+scikit-learn==1.8.0
+xgboost==3.2.0
+
+# ── 可视化（交互式） ──────────────────────────────────
+plotly==6.7.0
+
+# ── 开发环境 ──────────────────────────────────────────
+jupyter==1.1.1
+nbformat>=5.0.0
