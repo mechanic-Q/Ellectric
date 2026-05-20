@@ -25,7 +25,12 @@ A hands-on learning journey through AI-driven electricity trading — from pulli
   4. Learner executes the load forecasting notebook: trains an XGBoost model, views MAE/RMSE/MAPE on a proper temporal test split, and sees load-vs-prediction overlay plots and error distribution histograms in the notebook output
   5. Learner executes the end-to-end baseline notebook: runs a naive persistence forecast through a minimal simulation, calculates P&L, and sees a cumulative profit chart — proving all five pipeline layers exist and connect
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Walking Skeleton: environment setup, PUDL data download, data cleaning, end-to-end persistence forecast → P&L chart
+- [ ] 01-02-PLAN.md — XGBoost load forecasting with TimeSeriesSplit, progressive feature engineering, evaluation metrics, all visualizations, DataLoader abstraction
+- [ ] 01-03-PLAN.md — Docker Compose skeleton, notebook polish (markdown + reflection questions), README data dictionary, data version pinning
 
 ### Phase 2: Deep Prediction + Market Simulation
 **Goal:** Learners compare automated vs manual forecasting (OpenSTEF vs XGBoost), predict day-ahead electricity prices with benchmark models, configure and run ASSUME market simulations with variable generation mixes, and visualize market outcomes through interactive dashboards.
@@ -75,7 +80,7 @@ A hands-on learning journey through AI-driven electricity trading — from pulli
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Foundation + Basic Prediction | 0/TBD | Not started | - |
+| 1. Data Foundation + Basic Prediction | 0/3 | Planned | - |
 | 2. Deep Prediction + Market Simulation | 0/TBD | Not started | - |
 | 3. Trading Agents + Backtesting | 0/TBD | Not started | - |
 | 4. Integration + LLM Interface | 0/TBD | Not started | - |
