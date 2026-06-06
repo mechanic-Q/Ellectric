@@ -42,7 +42,7 @@ Plans:
 
 - [x] 01-03-PLAN.md — Docker Compose skeleton (commented-out TimescaleDB+Grafana for Phase 2), README data dictionary + project structure, Chinese data acquisition guide (docs/chinese-electricity-data-guide.md), notebook polish (思考题 reflection questions, error handling, learning objectives)
 
-### Phase 2: Deep Prediction + Market Simulation
+### Phase 2: 中国电力市场预测与仿真
 
 **Goal:** 基于中国电价数据（ZionLuo/price data.xlsx），使用 sklearn Lasso 实现 LEAR 日前电价预测；用 epftoolbox 5 个基准数据集 + DM/GW 统计检验验证方法正确性；配置 ASSUME 中国省间现货仿真环境；通过 Grafana 可视化市场出清结果。
 **Mode:** mvp

@@ -23,9 +23,10 @@
 | Technology | Version | 用途 | 推荐原因 |
 |------------|---------|---------|-----------------|
 | **OpenSTEF** | 3.4.93 | 短期能源预测的自动化 ML 管道 (负荷 + 发电) | LF Energy 项目, MPL-2.0 license。生产稳定 (5/5 成熟度)。提供端到端管道: 特征工程 → 模型训练 → 回测 → 预测。v4.0.0 处于活跃 alpha 阶段 (43 个预发布), 向前兼容。 |
-| **epftoolbox** | git (master) | 电价预测基准测试，含 LEAR 和 DNN 模型, 5个 EU/US 市场数据集 | 352★ 学术标准。提供 EPEX-BE/FR/DE, NordPool, PJM 的即用型日前电价预测。Diebold-Mariano 和 Giacomini-White 统计检验。通过 `pip install git+https://github.com/jeslago/epftoolbox.git` 安装。Apache-2.0 license。 |
+| **epftoolbox** | git (master) | 电价预测基准数据源 + 统计检验工具（DM/GW），含 5 个 EU/US 市场参考数据集。LEAR 模型用 sklearn.Lasso 替代以避开 TensorFlow/PyTorch 冲突。 | 352★ 学术标准。提供 EPEX-BE/FR/DE, NordPool, PJM 的即用型日前电价预测。Diebold-Mariano 和 Giacomini-White 统计检验。通过 `pip install git+https://github.com/jeslago/epftoolbox.git` 安装。Apache-2.0 license。 |
 | **scikit-learn** | 1.8.0 | ML 算法: RandomForest, GradientBoosting, LinearRegression, preprocessing, metrics | Python ML 生态系统的基础。被 OpenSTEF 内部使用。在转向 DL 之前先用 sklearn 模型。 |
 | **xgboost** | 3.2.0 | 用于表格时序预测的梯度提升树 | 在能源预测基准测试中始终表现最佳。处理缺失数据, 内置特征重要性。CPU 优化 — 在开发硬件上运行。OpenSTEF 使用 xgboost 作为默认后端。 |
+| **sklearn.linear_model.Lasso** | (via scikit-learn 1.8.0) | LEAR 日前电价预测 (LASSO 回归 + 特征工程) | 替代 epftoolbox 的 TensorFlow LEAR 实现。LEAR = Lasso Estimated AutoRegressive，核心是 L1 正则化线性回归。轻量级，CPU 友好，无依赖冲突。 |
 | **darts** | 0.44.1 | 用户友好的时序预测库 (可选) | 干净的 API 包装 30+ 模型 (ARIMA, Prophet, N-BEATS, TFT)。适合在 OpenSTEF 管道之外进行实验。在探索多样化模型架构时使用。 |
 
 **模型策略 (根据 PROJECT.md 约束):**
@@ -177,7 +178,7 @@ pip install prefect==3.7.1  # 用于定时数据刷新管道
 | pandas 3.0.3 | Python ≥3.10 | Arrow 后端; 可能会破坏依赖已弃用 pandas API 的包 |
 | PyPSA 1.2.1 | Python ≥3.10 | ASSUME[network] 必需。独立使用可选。 |
 
-**关键兼容性说明:** `epftoolbox` 自 2023 年以来未更新，且依赖 TensorFlow (与 PyTorch 冲突)。**建议**: 不要在同一环境中安装 epftoolbox。相反，单独克隆它并仅使用其数据集和基准参考预测。LEAR 模型可以用 scikit-learn 重新实现 (它本质上是 LASSO regression)。
+**关键兼容性说明:** `epftoolbox` 自 2023 年以来未更新，且依赖 TensorFlow (与 PyTorch 冲突)。**建议**: 不要在同一环境中安装 epftoolbox。相反，单独克隆它并仅使用其数据集和基准参考预测。LEAR 模型使用 sklearn.linear_model.Lasso 实现（Phase 2 方案）。
 
 ## 各阶段技术栈模式
 
@@ -188,7 +189,7 @@ pip install prefect==3.7.1  # 用于定时数据刷新管道
 - 原因: 最快路径到可工作的预测模型，无框架开销
 
 **阶段 2 (深入预测与市场仿真):**
-- 添加: OpenSTEF + ASSUME + epftoolbox (仅数据集)
+- 添加: OpenSTEF + ASSUME + epftoolbox (仅基准数据集 + DM/GW 统计检验) + sklearn.Lasso (LEAR 实现)
 - 工作流: 从 notebooks 过渡到 .py scripts
 - 原因: 基础扎实后引入领域特定工具
 

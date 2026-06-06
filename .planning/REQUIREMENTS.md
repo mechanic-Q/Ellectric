@@ -19,18 +19,19 @@
 - [ ] **DATA-02**: 实现 DataLoader 抽象类，统一数据访问接口，支持数据版本锁定
 - [ ] **DATA-03**: 数据清洗管道：缺失值填充、异常值检测(IQR)、时区标准化到 UTC
 - [ ] **DATA-04**: 时序特征工程：小时/星期/节日标识、滞后特征(lag features)、滚动窗口统计
+- [ ] **DATA-05**: 中国电价数据接入：从 ZionLuo/Electricity-Price-Forecasting 获取 price data.xlsx（日前价格、实时价格、统调负荷、新能源出力、省间联络线，~2000条小时级数据），通过 DataLoader 统一接口加载
 
 ### 预测
 
 - [ ] **PRED-01**: 使用 XGBoost 构建手动短期负荷预测模型，包含训练/测试集(TimeSeriesSplit)、模型持久化
 - [ ] **PRED-02**: 运行 OpenSTEF 自动化预测管道，与手动 XGBoost 模型对比 MAE/RMSE/MAPE
-- [ ] **PRED-03**: 使用 epftoolbox 进行日前电价预测（LEAR/DNN 模型），包含 5 个参考数据集
+- [ ] **PRED-03**: 使用 sklearn.linear_model.Lasso 实现 LEAR 日前电价预测（LASSO 回归 + 滞后特征 + 日历特征），训练数据为中国现货电价（DATA-05）；使用 epftoolbox 5 个基准数据集（EPEX-BE/FR/DE, NordPool, PJM）进行 DM/GW 统计检验和跨市场对比（epftoolbox 仅作基准对比，不安装在同一环境）
 - [ ] **PRED-04**: 多模型对比仪表板：XGBoost vs OpenSTEF（负荷），LEAR vs DNN vs 基准（电价），交互式 plotly 图表
 
 ### 市场仿真
 
 - [ ] **SIM-01**: 安装并运行 ASSUME 电力市场仿真，至少完成一次 7 天仿真（使用默认智能体）
-- [ ] **SIM-02**: 通过 YAML 配置修改发电组合（煤/气/风/光/储能）、需求曲线、出清机制
+- [ ] **SIM-02**: 通过 YAML 配置修改发电组合（煤/气/风/光/储能）、需求曲线、出清机制 — 优先配置中国省间现货市场规则（报价上下限、偏差考核、新能源优先调度）
 - [ ] **SIM-03**: 场景构建器：预制场景模板（大风日、夏季高峰、储能套利），支持保存/加载
 - [ ] **SIM-04**: 通过 Grafana 仪表板可视化市场出清结果（出清价格、调度、利润）
 
@@ -93,6 +94,7 @@
 | DATA-02 | 阶段1 | 待开始 |
 | DATA-03 | 阶段1 | 待开始 |
 | DATA-04 | 阶段1 | 待开始 |
+| DATA-05 | 阶段2 | 待开始 |
 | PRED-01 | 阶段1 | 待开始 |
 | VIZ-01 | 阶段1 | 待开始 |
 | PRED-02 | 阶段2 | 待开始 |

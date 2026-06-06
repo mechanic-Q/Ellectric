@@ -284,4 +284,17 @@ def calculate_pnl(actual: pd.Series, forecast: pd.Series, price: float = 50.0):
 | XGBoost 默认参数 MAE 表现差 | 接受任何结果 — 这是学习项目，不是生产调优 |
 
 ---
+
+## 9. Phase 2 重规划 (2026-06-06)
+
+**epftoolbox LEAR reimplementation gap** ✅ 已解决：
+
+- 原风险：epftoolbox 依赖 TensorFlow/Keras，与 ASSUME 的 PyTorch 冲突，无法在同一环境安装
+- 解决方案：Phase 2 使用 sklearn.linear_model.Lasso 实现 LEAR 模型（LEAR = Lasso Estimated AutoRegressive，本质是 L1 正则化线性回归 + 时序特征工程）
+- epftoolbox 角色变化：从"预测工具"降级为"基准数据源 + DM/GW 统计检验工具"
+- 5 个 epftoolbox 数据集（EPEX-BE/FR/DE, NordPool, PJM）仅用于跨市场方法验证
+- 中国电价数据源：ZionLuo/Electricity-Price-Forecasting 的 price data.xlsx（～2000条小时级数据）
+- ASSUME Phase 2 配置：优先中国省间现货市场规则（报价上下限、偏差考核、新能源优先调度）
+
+---
 *调研完成于: 2026-05-20*
