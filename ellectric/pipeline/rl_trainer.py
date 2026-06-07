@@ -340,8 +340,11 @@ class RLAgentFactory:
             )
 
         algo_cls = cls.ALGORITHMS[algo]
+        import gymnasium as gym
+        from gymnasium.spaces import Dict as DictSpace
+        policy = "MultiInputPolicy" if isinstance(env.observation_space, DictSpace) else "MlpPolicy"
         model_kwargs: dict[str, Any] = {
-            "policy": "MlpPolicy",
+            "policy": policy,
             "env": env,
             "tensorboard_log": tensorboard_log,
             "verbose": verbose,

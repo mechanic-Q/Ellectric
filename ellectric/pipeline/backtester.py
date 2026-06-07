@@ -223,12 +223,12 @@ class BacktestRunner:
         while True:
             t = env._current_step
 
-            if label == "rl":
-                if not isinstance(model, BaseRLAgent):
-                    raise ValueError("RL 策略需要提供 BaseRLAgent 实例")
-                action = model.predict(obs, deterministic=True)
-            else:
+            if strat_fn is None and not isinstance(model, BaseRLAgent):
+                raise ValueError("无法解析策略函数")
+            if strat_fn is not None:
                 action = strat_fn(env, t)
+            else:
+                action = model.predict(obs, deterministic=True)
 
             obs, _reward, terminated, truncated, info = env.step(action)
 
