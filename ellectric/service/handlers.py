@@ -37,9 +37,9 @@ _RL_STRATEGIES = {"ppo", "sac", "td3"}
 _SUPPORTED_STRATEGIES = _BASELINE_STRATEGIES | _RL_STRATEGIES
 
 _CONFIGURE_MAP = {
-    "default": "ellectric/assume/configs/default.yaml",
-    "summer_peak": "ellectric/assume/configs/summer_peak.yaml",
-    "wind_high": "ellectric/assume/configs/wind_high.yaml",
+    "default": "ellectric/assume/configs/assume_china_config.yaml",
+    "summer_peak": "ellectric/assume/configs/assume_china_summer_peak.yaml",
+    "wind_high": "ellectric/assume/configs/assume_china_wind_high.yaml",
 }
 
 
@@ -142,7 +142,7 @@ def run_simulate(req: SimulateRequest) -> SimulateResponse:
 
     result = subprocess.run(
         [
-            "python", "assume/run_simulation.py",
+            "python", "ellectric/assume/run_simulation.py",
             "--config", config_path,
             "--output", output_dir,
             "--days", str(req.days),
