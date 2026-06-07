@@ -179,14 +179,14 @@ fi
 echo -e "\n[5/5] Phase 3 Notebook JSON 有效性验证"
 
 PHASE3_NOTEBOOKS=(
-    "06_rl_trading_agent.ipynb"
-    "07_multi_agent_backtest.ipynb"
-    "08_model_explainability.ipynb"
+    "09_rl_trading_agent.ipynb"
+    "10_multi_agent_backtest.ipynb"
+    "11_model_explainability.ipynb"
 )
 
 for nb in "${PHASE3_NOTEBOOKS[@]}"; do
     nb_path=""
-    for base in "$PROJECT_ROOT/ellectric/notebooks" "/mnt/e/Ellectric/ellectric/notebooks"; do
+    for base in "$PROJECT_ROOT/ellectric/notebooks"; do
         if [ -f "$base/$nb" ]; then
             nb_path="$base/$nb"
             break
