@@ -1,0 +1,132 @@
+name: scan-docs
+description: 并行生成项目的扫描文档（7份）
+spec_version: 1
+
+roles:
+  - id: arch
+    name: "技术架构"
+    task: "生成 ARCHITECTURE.md"
+    inputs:
+      paths:
+        - "src/*.js"
+        - "package.json"
+      hints:
+        grep_patterns: ["class ", "export ", "import ", "schema", "CREATE TABLE"]
+    outputs:
+      - path: ".sillyspec/docs/<project>/scan/ARCHITECTURE.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 20
+          - type: contains_sections
+            sections: ["技术栈", "架构概览"]
+    constraints:
+      - "禁止读源码全文，只用 grep/rg 搜索"
+      - "Schema 只记表名+说明+字段数"
+
+  - id: conventions
+    name: "代码约定"
+    task: "生成 CONVENTIONS.md"
+    inputs:
+      paths: ["src/"]
+      hints:
+        grep_patterns: ["function ", "const ", "async ", "try ", "catch "]
+    outputs:
+      - path: ".sillyspec/docs/<project>/scan/CONVENTIONS.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 15
+          - type: contains_sections
+            sections: ["框架隐形规则", "代码风格"]
+    constraints:
+      - "禁止读源码全文"
+      - "提取 3-5 个典型模式"
+
+  - id: structure
+    name: "目录结构+外部集成"
+    task: "生成 STRUCTURE.md 和 INTEGRATIONS.md"
+    inputs:
+      paths: ["./"]
+      hints:
+        grep_patterns: ["fetch", "http", "WebSocket", "ws", "chokidar"]
+    outputs:
+      - path: ".sillyspec/docs/<project>/scan/STRUCTURE.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 15
+      - path: ".sillyspec/docs/<project>/scan/INTEGRATIONS.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 15
+    constraints:
+      - "STRUCTURE: 目录树+模块说明"
+      - "INTEGRATIONS: 按类型分组外部依赖"
+
+  - id: quality
+    name: "测试+债务+概览"
+    task: "生成 TESTING.md、CONCERNS.md、PROJECT.md"
+    inputs:
+      paths: ["src/", "packages/"]
+      hints:
+        grep_patterns: ["TODO", "FIXME", "deprecated", "test", "describe"]
+    outputs:
+      - path: ".sillyspec/docs/<project>/scan/TESTING.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 10
+          - type: no_placeholder
+      - path: ".sillyspec/docs/<project>/scan/CONCERNS.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 10
+          - type: contains_sections
+            sections: ["代码质量", "依赖风险"]
+      - path: ".sillyspec/docs/<project>/scan/PROJECT.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 15
+          - type: contains_sections
+            sections: ["项目简介", "技术栈"]
+    constraints:
+      - "CONCERNS 按严重程度分组（🔴/🟡/🟢）"
+      - "不编造不存在的测试"
+
+orchestration:
+  mode: parallel
+  max_concurrent: 4
+  timeout_per_role: 120
+
+checks:
+  workflow_level:
+    - type: file_count
+      path: "scan/"
+      min: 7
+    - type: no_empty_files
+
+retry:
+  max_attempts: 1
+  include_failure_context: true
+  retry_scope: failed_role_only
+
+on_check_failure: prompt_retry
+
+permissions:
+  write_mode: direct
+  write_scope:
+    - ".sillyspec/docs/<project>/scan/"
+  allow_shell: true
+  allow_network: false
+  allow_git: false

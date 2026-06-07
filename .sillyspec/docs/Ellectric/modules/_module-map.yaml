@@ -1,7 +1,7 @@
 schema_version: 1
 project: Ellectric
 source_commit: 53bf8ae
-generated_at: 2026-06-06 21:36:10
+generated_at: 2026-06-07 12:40:00
 generator: sillyspec-scan
 modules:
   data-loader:
@@ -89,7 +89,7 @@ modules:
     needs_review: false
     concerns: []
     review_reasons: []
-  forecaster:
+   forecaster:
     status: active
     doc: modules/forecaster.md
     paths:
@@ -114,7 +114,7 @@ modules:
       - calculate_pnl
       - plot_pnl
     depends_on: []
-    used_by: []
+    used_by: [trading-env, shap-explainer, notebooks]
     needs_review: false
     concerns: []
     review_reasons: []
@@ -171,7 +171,7 @@ modules:
       - plot_coefficients
       - get_feature_columns
     depends_on: [price-loader]
-    used_by: [notebooks]
+    used_by: [trading-env, shap-explainer, notebooks]
     needs_review: false
     concerns: []
     review_reasons: []
@@ -304,6 +304,112 @@ modules:
     needs_review: false
     concerns: []
     review_reasons: []
+  trading-env:
+    status: active
+    doc: modules/trading-env.md
+    paths:
+      - ellectric/pipeline/trading_env.py
+    tags:
+      - rl
+      - environment
+      - gymnasium
+      - trading
+    aliases:
+      - ElectricityMarketEnv
+      - trading environment
+    entrypoints:
+      - ElectricityMarketEnv
+      - RewardRegistry
+    main_symbols:
+      - ElectricityMarketEnv
+      - RewardRegistry
+      - RewardFunction
+      - _profit_only
+      - _risk_adjusted
+      - _volume_penalty
+    depends_on: [forecaster, price-forecaster]
+    used_by: [rl-trainer, backtester, notebooks]
+    needs_review: false
+    concerns: []
+    review_reasons: []
+  rl-trainer:
+    status: active
+    doc: modules/rl-trainer.md
+    paths:
+      - ellectric/pipeline/rl_trainer.py
+    tags:
+      - rl
+      - ppo
+      - td3
+      - sac
+      - training
+    aliases:
+      - RLAgentFactory
+      - BaseRLAgent
+    entrypoints:
+      - RLAgentFactory
+      - BaseRLAgent
+    main_symbols:
+      - RLAgentFactory
+      - BaseRLAgent
+      - _SB3Adapter
+    depends_on: [trading-env]
+    used_by: [backtester, notebooks]
+    needs_review: false
+    concerns: []
+    review_reasons: []
+  backtester:
+    status: active
+    doc: modules/backtester.md
+    paths:
+      - ellectric/pipeline/backtester.py
+    tags:
+      - backtesting
+      - pnl
+      - strategy
+      - evaluation
+    aliases:
+      - BacktestRunner
+      - backtest
+    entrypoints:
+      - BacktestRunner
+    main_symbols:
+      - BacktestRunner
+      - baseline_persistence
+      - baseline_mean
+      - oracle_strategy
+    depends_on: [trading-env, rl-trainer]
+    used_by: [notebooks]
+    needs_review: false
+    concerns: []
+    review_reasons: []
+  shap-explainer:
+    status: active
+    doc: modules/shap-explainer.md
+    paths:
+      - ellectric/pipeline/shap_explainer.py
+    tags:
+      - shap
+      - explainability
+      - xgboost
+      - lear
+      - interpretation
+    aliases:
+      - SHAP
+      - model interpretation
+    entrypoints:
+      - explain_xgboost_sample
+      - explain_lear_sample
+      - feature_importance_ranking
+    main_symbols:
+      - explain_xgboost_sample
+      - explain_lear_sample
+      - feature_importance_ranking
+    depends_on: [forecaster, price-forecaster]
+    used_by: [notebooks]
+    needs_review: false
+    concerns: []
+    review_reasons: []
   notebooks:
     status: active
     doc: modules/notebooks.md
@@ -329,6 +435,10 @@ modules:
       - price-forecaster
       - statistical-tests
       - assume-simulation
+      - trading-env
+      - rl-trainer
+      - backtester
+      - shap-explainer
     used_by: []
     needs_review: false
     concerns: []

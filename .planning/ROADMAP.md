@@ -98,5 +98,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Data Foundation + Basic Prediction | 3/3 | Shipped | 2026-06-06 |
 | 2. 中国电力市场预测与仿真 | 0/TBD | Planned | - |
-| 3. Trading Agents + Backtesting | 0/TBD | Not started | - |
+| 3. Trading Agents + Backtesting | 0/TBD | Shipped | 2026-06-07 |
 | 4. Integration + LLM Interface | 0/TBD | Not started | - |

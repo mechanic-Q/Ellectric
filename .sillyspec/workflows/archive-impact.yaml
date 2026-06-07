@@ -1,0 +1,79 @@
+name: archive-impact
+description: 分析变更影响的模块并同步模块文档
+spec_version: 1
+
+roles:
+  - id: impact-analyzer
+    name: "影响分析"
+    task: "分析 git diff，提取变更影响模块"
+    inputs:
+      paths: [".sillyspec/changes/", ".sillyspec/docs/*/modules/"]
+      hints:
+        grep_patterns: ["_module-map", "module-impact", "git diff"]
+    outputs:
+      - path: ".sillyspec/changes/<change-name>/module-impact.md"
+        required: true
+        checks:
+          - type: file_exists
+          - type: min_lines
+            min: 20
+          - type: contains_sections
+            sections: ["模块影响矩阵", "未匹配文件"]
+    constraints:
+      - "以 git diff 为准（真实 > 声明）"
+      - "影响类型：逻辑变更/数据结构变更/接口变更/调用关系变更/配置变更/新增"
+      - "需要 review 标记不确定的影响"
+
+  - id: doc-syncer
+    name: "文档同步"
+    task: "根据 module-impact.md 同步更新模块索引和卡片"
+    depends_on:
+      - impact-analyzer
+    inputs:
+      from_role: impact-analyzer
+      output: module-impact
+      output_description: "变更影响分析结果，包含模块影响矩阵"
+      paths: [".sillyspec/docs/*/modules/"]
+      hints:
+        grep_patterns: ["_module-map", "module-impact"]
+    outputs:
+      - path: ".sillyspec/docs/sillyspec/modules/_module-map.yaml"
+        required: false
+        checks:
+          - type: file_exists
+      - path: ".sillyspec/docs/sillyspec/modules/<module-id>.md"
+        required: false
+        # checks 跳过：路径含动态 <module-id> 占位符，不适合静态检查
+    constraints:
+      - "结构化事实改 _module-map.yaml，语义解释改模块卡片"
+      - "人工备注区域永远保护，不覆盖"
+      - "更新前展示 diff 摘要，请用户确认"
+
+orchestration:
+  mode: sequential
+  timeout_per_role: 180
+
+checks:
+  role_level:
+    - type: file_exists
+    - type: min_lines
+      min: 10
+  workflow_level:
+    - type: file_exists
+      path: ".sillyspec/changes/<change-name>/module-impact.md"
+
+retry:
+  max_attempts: 1
+  include_failure_context: true
+  retry_scope: failed_role_only
+
+on_check_failure: prompt_retry
+
+permissions:
+  write_mode: patch_only
+  write_scope:
+    - ".sillyspec/docs/"
+    - ".sillyspec/changes/<change-name>/"
+  allow_shell: true
+  allow_network: false
+  allow_git: true
