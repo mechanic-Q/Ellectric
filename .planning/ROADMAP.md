@@ -97,6 +97,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Foundation + Basic Prediction | 3/3 | Shipped | 2026-06-06 |
-| 2. 中国电力市场预测与仿真 | 0/TBD | Planned | - |
-| 3. Trading Agents + Backtesting | 0/TBD | Not started | - |
+| 2. 中国电力市场预测与仿真 | 0/TBD | Shipped | 2026-06-07 |
+| 3. Trading Agents + Backtesting | 0/TBD | Shipped | 2026-06-07 |
 | 4. Integration + LLM Interface | 0/TBD | Not started | - |
+
+## Notes
+
+- Phase 2 notebook (06-08) 和 Phase 3 notebook 原始编号冲突，已重命名 Phase 3 notebook 为 09/10/11，最终学习路径: 01→05 (P1), 06→08 (P2), 09→11 (P3).
