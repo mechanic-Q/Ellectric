@@ -318,33 +318,103 @@ class BacktestRunner:
         Returns:
             Plotly Figure 对象
         """
+        # ── 策略中文映射 — 用于图表显示 ──────────────────
+        NAME_MAP = {
+            "oracle": "先知策略 (Oracle)",
+            "rl_ppo": "PPO 强化学习 (RL Agent)",
+            "rl_td3": "TD3 强化学习 (RL Agent)",
+            "rl_sac": "SAC 强化学习 (RL Agent)",
+            "baseline": "持久法基线 (Persistence)",
+            "baseline_persistence": "持久法基线 (Persistence)",
+            "baseline_mean": "均值基线 (Mean Baseline)",
+        }
+        DESC = (
+            "<b>怎么看这张图 (How to read)</b><br>"
+            "• 折线 = 各策略的累计盈亏轨迹（纵轴正值 = 盈利，负值 = 亏损）<br>"
+            "• <b>先知 Oracle</b> = 已知真实负荷的完美投标，理论上界<br>"
+            "• <b>基线 Baseline</b> = 持续法 (t-24h 作为今日投标)，传统调度基准<br>"
+            "• <b>RL Agent</b> = PPO 强化学习智能体，训练后自主投标<br>"
+            "• <b>价格接受者</b>：只决定投标量，出清价来自历史数据<br>"
+            "• <b>P&L 公式</b> = -|投标量 - 实际负荷| × 出清价 / 1000"
+        )
+
         fig = go.Figure()
         colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
 
         for i, (name, df) in enumerate(results.items()):
+            display_name = NAME_MAP.get(name, name)
             fig.add_trace(
                 go.Scatter(
                     x=df["timestamp"],
                     y=df["pnl_cumulative"],
                     mode="lines",
-                    name=name,
+                    name=display_name,
                     line=dict(color=colors[i % len(colors)], width=2),
+                    hovertemplate=(
+                        "<b>%{fullData.name}</b><br>"
+                        "时间: %{x|%Y-%m-%d %H:%M}<br>"
+                        "累计 P&L: %{y:,.0f} 元<extra></extra>"
+                    ),
                 )
             )
 
         fig.update_layout(
-            title=dict(text=title, font=dict(size=18)),
-            xaxis_title="时间",
-            yaxis_title="累计 P&L ($)",
-            height=500,
+            title=dict(
+                text=(
+                    f"图1 · {title}<br>"
+                    f"<sub style='font-size:12px;color:#666'>"
+                    f"Cumulative P&L Comparison · Multi-Strategy Backtest</sub>"
+                ),
+                x=0.02,
+                y=0.96,
+                xanchor="left",
+                font=dict(size=18, color="#222"),
+            ),
+            xaxis=dict(
+                title="时间 Time (YYYY-MM-DD HH:MM, UTC)",
+                showgrid=True,
+                gridcolor="#eee",
+            ),
+            yaxis=dict(
+                title="累计盈亏 Cumulative P&L (元/CNY)",
+                showgrid=True,
+                gridcolor="#eee",
+                zeroline=True,
+                zerolinecolor="#999",
+            ),
+            height=600,
             hovermode="x unified",
             legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
+                orientation="v",
+                yanchor="top",
+                y=0.98,
                 xanchor="right",
-                x=1,
+                x=0.98,
+                bgcolor="rgba(255,255,255,0.85)",
+                bordercolor="#ccc",
+                borderwidth=1,
             ),
+            margin=dict(l=80, r=40, t=110, b=190),
+            plot_bgcolor="white",
+            annotations=[
+                dict(
+                    x=0,
+                    y=-0.20,
+                    xref="paper",
+                    yref="paper",
+                    xanchor="left",
+                    yanchor="top",
+                    text=DESC,
+                    showarrow=False,
+                    align="left",
+                    font=dict(size=11, color="#333"),
+                    bgcolor="rgba(245,245,245,0.6)",
+                    bordercolor="#ddd",
+                    borderwidth=1,
+                    borderpad=8,
+                    width=720,
+                )
+            ],
         )
         return fig
 

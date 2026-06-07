@@ -280,7 +280,15 @@ def _build_waterfall(
     colors = ["#1f77b4" if s >= 0 else "#d62728" for s in top_shap]
 
     pred_value = float(base_value + sv.sum())
-    pred_label = f"预测值: {pred_value:.3f}"
+
+    DESC = (
+        "<b>怎么看这张图 (How to read)</b><br>"
+        "• 横轴 = SHAP 值，特征对预测的边际贡献（蓝色=推高，红色=压低）<br>"
+        "• <b>Base value</b> = 训练集平均预测值（不含当前样本特征）<br>"
+        "• <b>f(x)</b> = 当前样本实际预测值 = base + ΣSHAP 值<br>"
+        "• 柱上数字 = 该特征的 SHAP 贡献（正值=推高预测，负值=压低预测）<br>"
+        "• 鼠标悬停看特征值和 SHAP 精度"
+    )
 
     fig = go.Figure()
 
@@ -290,29 +298,84 @@ def _build_waterfall(
             y=top_names,
             orientation="h",
             marker_color=colors,
-            text=[f"{s:+.4f}  (val={v:.2f})" for s, v in zip(top_shap, top_feat_vals)],
-            textposition="outside",
-            name="SHAP 值",
+            text=[f"{s:+.2f}" for s in top_shap],
+            textposition="auto",
+            hovertemplate=(
+                "<b>特征 %{y}</b><br>"
+                "特征值: %{customdata:.3f}<br>"
+                "SHAP 贡献: %{x:+.4f}<extra></extra>"
+            ),
+            customdata=top_feat_vals,
+            name=f"{model_name} 特征贡献",
         )
     )
 
+    fig.add_vline(x=0, line_width=1, line_dash="dash", line_color="#888")
+
     fig.update_layout(
         title=dict(
-            text=(
-                f"{model_name} SHAP Waterfall — 样本 #{sample_idx}<br>"
-                f"<sup>base={base_value:.3f}, {pred_label}</sup>"
-            ),
-            font=dict(size=16),
+            text=f"图 · {model_name} SHAP 瀑布图 — 样本 #{sample_idx}",
+            x=0.02,
+            y=0.96,
+            xanchor="left",
+            font=dict(size=18, color="#222"),
         ),
-        xaxis=dict(title="SHAP 值 (特征对预测的贡献)"),
-        yaxis=dict(title="特征", autorange="reversed"),
-        height=min(100 + 30 * max_display, 800),
-        margin=dict(l=120, r=40, t=80, b=40),
+        xaxis=dict(
+            title="SHAP 值 — 特征对预测的边际贡献 (正→推高, 负→压低)",
+            showgrid=True,
+            gridcolor="#eee",
+            zeroline=True,
+            zerolinecolor="#999",
+        ),
+        yaxis=dict(
+            title="特征 Feature",
+            autorange="reversed",
+            automargin=True,
+            showgrid=False,
+        ),
+        height=min(100 + 45 * max_display, 800),
+        margin=dict(l=160, r=60, t=110, b=200),
         hovermode="y unified",
         showlegend=False,
+        plot_bgcolor="white",
+        annotations=[
+            dict(
+                x=0.98,
+                y=0.98,
+                xref="paper",
+                yref="paper",
+                xanchor="right",
+                yanchor="top",
+                text=(
+                    f"<b>Base</b> = {base_value:.2f}<br>"
+                    f"<b>f(x)</b> = {pred_value:.2f}"
+                ),
+                showarrow=False,
+                align="right",
+                font=dict(size=11, color="#444"),
+                bgcolor="rgba(255,255,255,0.85)",
+                bordercolor="#ccc",
+                borderwidth=1,
+                borderpad=6,
+            ),
+            dict(
+                x=0,
+                y=-0.22,
+                xref="paper",
+                yref="paper",
+                xanchor="left",
+                yanchor="top",
+                text=DESC,
+                showarrow=False,
+                align="left",
+                font=dict(size=11, color="#333"),
+                bgcolor="rgba(245,245,245,0.6)",
+                bordercolor="#ddd",
+                borderwidth=1,
+                borderpad=8,
+                width=720,
+            ),
+        ],
     )
-
-    # 在 x=0 处添加一条参考线
-    fig.add_vline(x=0, line_width=1, line_dash="dash", line_color="gray")
 
     return fig
