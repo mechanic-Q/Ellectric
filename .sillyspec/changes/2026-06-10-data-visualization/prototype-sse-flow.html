@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>原型 — Ellectric Chat SSE 数据流</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: #0a0a0a;
+    color: #ccc;
+    padding: 40px;
+    line-height: 1.8;
+  }
+  h1 { color: #0ff; font-size: 16px; margin-bottom: 24px; }
+  .flow {
+    border-left: 2px solid #333;
+    padding-left: 30px;
+    margin-left: 20px;
+  }
+  .step {
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .step::before {
+    content: '●';
+    position: absolute;
+    left: -37px;
+    font-size: 10px;
+  }
+  .step.user::before  { color: #0ff; }
+  .step.http::before  { color: #f0a800; }
+  .step.sse::before   { color: #2ecc71; }
+  .step.agent::before { color: #e74c3c; }
+  .step.tool::before  { color: #9b59b6; }
+  .label {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    margin-right: 8px;
+  }
+  .label.user  { background: #0ff2; color: #0ff; }
+  .label.http  { background: #f0a80022; color: #f0a800; }
+  .label.sse   { background: #2ecc7122; color: #2ecc71; }
+  .label.agent { background: #e74c3c22; color: #e74c3c; }
+  .label.tool  { background: #9b59b622; color: #9b59b6; }
+  .desc { color: #888; }
+  .gap { height: 20px; }
+  hr { border: none; border-top: 1px dashed #333; margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<h1>⚡ Ellectric Chat — SSE 流式对话数据流</h1>
+
+<div class="flow">
+
+  <div class="step user">
+    <span class="label user">USER</span>
+    <span>输入: "帮我仿真夏季高峰7天"</span>
+  </div>
+
+  <div class="step http">
+    <span class="label http">POST</span>
+    <span>fetch('/chat/stream', { query, history })</span>
+  </div>
+
+  <div class="step agent">
+    <span class="label agent">API</span>
+    <span>server.py GET /chat/stream → create_agent_executor() → astream_events()</span>
+  </div>
+
+  <div class="step sse">
+    <span class="label sse">SSE</span>
+    <span>event: status → data: {"type":"status","content":"thinking"}</span>
+    <div class="desc">前端: 显示"思考中..."</div>
+  </div>
+
+  <div class="step tool">
+    <span class="label tool">TOOL</span>
+    <span>event: tool_call → data: {"type":"tool_call","tool":"run_simulation"}</span>
+    <div class="desc">前端: 显示黄色工具状态标签 + spinner</div>
+  </div>
+
+  <div class="step sse">
+    <span class="label sse">SSE</span>
+    <span>Agent 调用 POST /simulate → pipeline → 返回结果</span>
+  </div>
+
+  <div class="step tool">
+    <span class="label tool">TOOL</span>
+    <span>event: tool_result → data: {"type":"tool_result","tool":"run_simulation"}</span>
+    <div class="desc">前端: 标签变绿色 "run_simulation · 完成"</div>
+  </div>
+
+  <div class="step sse">
+    <span class="label sse">SSE</span>
+    <span>event: token → data: {"type":"token","content":"夏季"}</span>
+  </div>
+
+  <div class="step sse">
+    <span class="label sse">SSE</span>
+    <span>event: token → data: {"type":"token","content":"高峰仿真"}</span>
+  </div>
+
+  <div class="step sse">
+    <span class="label sse">SSE</span>
+    <span>event: token → data: {"type":"token","content":"结果：..."}</span>
+    <div class="desc">...更多 token... 前端逐字渲染 + Markdown + 光标闪烁</div>
+  </div>
+
+  <div class="step sse">
+    <span class="label sse">SSE</span>
+    <span>event: done → 数据: {"type":"done"}</span>
+    <div class="desc">前端: 移除光标，最终 Markdown 渲染</div>
+  </div>
+
+</div>
+
+<hr>
+
+<h1>📁 文件结构</h1>
+
+<pre style="color:#888; margin-left:20px;">
+ellectric/
+├── api/
+│   ├── server.py          ← 新增 SSE 端点 + StaticFiles mount
+│   └── static/
+│       └── index.html     ← 聊天 UI (单文件 CSS+JS, 已实现)
+├── chat/
+│   └── streaming.py       ← SSE agent 流式封装 (新增)
+├── llm/
+│   ├── agent.py           ← ChatOpenAI streaming=True (修改)
+│   └── tools.py           ← 不改
+└── service/
+    └── handlers.py        ← 不改
+</pre>
+
+<hr>
+
+<h1>🔌 端点变更</h1>
+
+<pre style="color:#888; margin-left:20px;">
+GET  /health              [不变]
+POST /predict             [不变]
+POST /simulate            [不变]
+POST /backtest            [不变]
+POST /explain             [不变]
+<span style="color:#2ecc71;">POST /chat/stream          [新增]  SSE 流式对话</span>
+GET  /                    [新增]  StaticFiles → index.html
+</pre>
+
+</body>
+</html>
